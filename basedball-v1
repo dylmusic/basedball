@@ -1,0 +1,258 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+/*
+
+$$\                                           $$\ $$\                 $$\ $$\ 
+$$ |                                          $$ |$$ |                $$ |$$ |
+$$$$$$$\   $$$$$$\   $$$$$$$\  $$$$$$\   $$$$$$$ |$$$$$$$\   $$$$$$\  $$ |$$ |
+$$  __$$\  \____$$\ $$  _____|$$  __$$\ $$  __$$ |$$  __$$\  \____$$\ $$ |$$ |
+$$ |  $$ | $$$$$$$ |\$$$$$$\  $$$$$$$$ |$$ /  $$ |$$ |  $$ | $$$$$$$ |$$ |$$ |
+$$ |  $$ |$$  __$$ | \____$$\ $$   ____|$$ |  $$ |$$ |  $$ |$$  __$$ |$$ |$$ |
+$$$$$$$  |\$$$$$$$ |$$$$$$$  |\$$$$$$$\ \$$$$$$$ |$$$$$$$  |\$$$$$$$ |$$ |$$ |
+\_______/  \_______|\_______/  \_______| \_______|\_______/  \_______|\__|\__|
+                                                                              
+                                                                                                                                                  
+*/
+
+
+contract basedball {
+    address public owner;
+    uint256 public constant GAME1_COST = 1000000000000000000; // Cost per game
+    uint256 private nonce = 0; // Nonce for random number generation
+
+    mapping(address => uint256) public rewardscore;
+    mapping(address => uint256) public HOTDOGS;
+    mapping(address => uint256) public totalGames;
+    mapping(address => uint256) public unclaimedGames;
+    mapping(address => uint256) public totalScore;
+    mapping(address => uint256) public lastGameTime;
+    mapping(address => uint256) public dailyStreak;
+    mapping(address => uint256) public highestStreak;
+    address[] public players;
+
+
+    event GameResult(address indexed player, uint256[30] result, uint256 score);
+    event RewardScoreUpdated(address indexed player, uint256 newRewardScore);
+    event HotdogsUpdated(address indexed player, uint256 newHotdogsTotal);
+    event GamesPlayedUpdated(address indexed player, uint256 totalGamesPlayed);
+    event UnclaimedGamesUpdated(address indexed player, uint256 unclaimedGamesPlayed);
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the contract owner can call this function.");
+        _;
+    }
+   receive() external payable {
+  }
+    function game1() external payable {
+        playGame(GAME1_COST, 1);
+    }
+
+    function game10() external payable {
+        playGame(GAME1_COST * 10, 10);
+    }
+
+    function game100() external payable {
+        playGame(GAME1_COST * 100, 100);
+    }
+
+    function game1000() external payable {
+        playGame(GAME1_COST * 1000, 1000);
+    }
+
+    function game10000() external payable {
+        playGame(GAME1_COST * 10000, 10000);
+    }
+
+function playGame(uint256 gameCost, uint256 gameType) private {
+    require(msg.value >= gameCost, "Insufficient ETH sent.");
+    uint256 gamesToPlay = msg.value / gameCost;
+
+
+    // Check if it's a new calendar day since the last game
+    if (isNewDay(lastGameTime[msg.sender])) {
+        dailyStreak[msg.sender] += 1;  // Increment streak if today is a new day
+        // Update highest streak if the current daily streak is a new high
+        if (dailyStreak[msg.sender] > highestStreak[msg.sender]) {
+            highestStreak[msg.sender] = dailyStreak[msg.sender];
+        }
+    } else if (lastGameTime[msg.sender] == 0) { // No games have been played yet
+        dailyStreak[msg.sender] = 1;
+    }
+
+    lastGameTime[msg.sender] = block.timestamp;
+    totalGames[msg.sender] += gamesToPlay;
+    unclaimedGames[msg.sender] += gamesToPlay;
+    players.push(msg.sender);
+    
+
+    for (uint256 i = 0; i < gamesToPlay; i++) {
+        uint256[30] memory gameResult = simulateGame();
+        uint256 score = scoreGame(gameResult);
+        emit GameResult(msg.sender, gameResult, score);
+        updateRewardScore(msg.sender, score, gameType);
+
+        // Check if score is 0 and update HOTDOGS accordingly
+        if (score == 0) {
+            HOTDOGS[msg.sender] += gameType; // Increment HOTDOGS by gameType
+            // emit HotdogsUpdated(msg.sender, HOTDOGS[msg.sender]); // Emit an event indicating HOTDOGS has been updated
+        } else {
+            // Explicitly adding 0 to HOTDOGS for consistency, as per your requirement
+            HOTDOGS[msg.sender] += 0; // This operation does not change the state but is added as per your instruction
+        }
+    }
+}
+
+function scoreGame(uint256[30] memory gameResult) private pure returns (uint256) {
+    uint256 score = 0;
+    uint256 outs = 0;
+    uint256 bases = 0; // Using a uint256 to represent the bases, each bit is a base
+
+    for (uint256 i = 0; i < 30; i++) {
+        uint256 action = gameResult[i];
+        uint256 newBases = 0;
+        uint256 runnersScored = 0;
+
+        for (uint256 j = 0; j < 4; j++) { // Loop through four bases
+            uint256 baseOccupied = (bases >> j) & 1;
+            uint256 newBase = j + action; // Advance to new base
+            uint256 potentialScore = (newBase >= 4) ? 1 : 0; // Score if newBase is 4 or more
+            uint256 baseAdvance = (newBase < 4) ? (1 << newBase) : 0; // Advance to newBase if less than 4
+
+            runnersScored += baseOccupied * potentialScore;
+            newBases |= baseOccupied * baseAdvance;
+        }
+
+        if (action > 0) {
+            if (action == 4) { // Home run
+                runnersScored += 1; // Batter scores
+            } else {
+                newBases |= 1 << (action - 1); // Batter advances to respective base
+            }
+        }
+
+        // Update score and outs uniformly
+        score += (outs < 3) ? runnersScored : 0;
+        outs += (action == 0 && outs < 3) ? 1 : 0;
+
+        // Update bases uniformly
+        bases = (outs < 3) ? newBases : 0;
+    }
+
+    return score;
+}
+
+
+function updateRewardScore(address player, uint256 score, uint256 gameType) private {
+    // Calculate the reward as the product of the score and the game type
+    uint256 reward = score * gameType;
+
+    // Update rewardscore and totalScore with the calculated reward
+    rewardscore[player] += reward;
+    totalScore[player] += reward;
+
+    // Optionally, emit events for these updates
+    emit RewardScoreUpdated(player, rewardscore[player]);
+}
+
+
+
+function simulateGame() private returns (uint256[30] memory) {
+    uint256[30] memory output;
+
+    for (uint256 i = 0; i < 30; i++) {
+        output[i] = getRandomResult(); // Directly use integers to represent results
+    }
+
+    return output;
+}
+
+function getRandomResult() private returns (uint256) {
+    nonce++; // Increment nonce for each random number generation
+    uint256 random = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, nonce))) % 100;
+    if (random < 33) return 0; // Out
+    else if (random < 66) return 1; // Single
+    else if (random < 83) return 2; // Double
+    else if (random < 93) return 3; // Triple
+    else return 4; // HomeRun
+}
+
+    function withdraw() external onlyOwner {
+        uint256 contractBalance = address(this).balance;
+        require(contractBalance > 0, "Contract has no balance to withdraw");
+        payable(owner).transfer(contractBalance);
+    }
+
+function distributeRewards() external onlyOwner {
+    address[] memory processed = new address[](players.length);
+    uint256 count = 0;
+
+    for (uint256 i = 0; i < players.length; i++) {
+        address player = players[i];
+        if (!hasProcessed(processed, count, player)) {
+            uint256 reward = (GAME1_COST * rewardscore[player]) / 5;
+            if (reward > 0 && address(this).balance >= reward) {
+                payable(player).transfer(reward); // Transfer the reward to the player
+
+                // Reset the reward score and unclaimed games
+                rewardscore[player] = 0;
+                unclaimedGames[player] = 0;
+
+                // Mark as processed
+                processed[count] = player;
+                count++;
+            }
+        }
+    }
+
+    delete players;
+}
+
+function isNewDay(uint256 lastTimestamp) private view returns (bool) {
+    uint256 lastDay = lastTimestamp / 86400; // Day number of the last game
+    uint256 currentDay = block.timestamp / 86400; // Current day number
+
+    return (currentDay == lastDay + 1); // Check if current day is exactly one day after the last game
+}
+
+function hasProcessed(address[] memory processed, uint256 count, address player) private pure returns (bool) {
+    for (uint256 i = 0; i < count; i++) {
+        if (processed[i] == player) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+    enum Result { Out, Single, Double, Triple, HomeRun }
+
+        event RewardClaimed(address indexed player, uint256 rewardAmount);
+
+    function claimRewards() public {
+        // Calculate the reward
+        uint256 reward = (GAME1_COST * rewardscore[msg.sender]) / 5;
+        
+        require(reward > 0, "No rewards to claim.");
+        
+        // Ensure contract has enough balance to cover the reward
+        require(address(this).balance >= reward, "Contract has insufficient funds.");
+        
+        // Reset the user's rewardscore to zero before transferring to prevent re-entrancy attacks
+        rewardscore[msg.sender] = 0;
+        unclaimedGames[msg.sender] = 0;
+
+        // Transfer the reward to the user
+        payable(msg.sender).transfer(reward);
+
+        // Emit an event for the claimed reward
+        emit RewardClaimed(msg.sender, reward);
+    }
+
+    
+}
+
