@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEGEN Basedball</title>
+    <style>
+        #degen-basedball-container {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .button-area {
+    display: flex;
+    max-height: 50px;
+    flex-shrink: 1;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 90%;
+    margin: 5px auto;
+    gap: 10px;
+}
+
+.game-type-dropdown, .game-count-dropdown {
+    flex: 1;
+    padding: 2px;
+    font-size: 10px;
+    color: #333;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+    max-height: 25px;
+}
+.game-type-dropdown {
+ max-width: 27%;
+}
+
+.game-count-dropdown {
+ max-width: 23%;
+}
+
+.pay-button {
+    display: block;
+    width: 90%;
+    margin: 5px auto;
+    padding: 10px;
+    font-size: 10px;
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    background-image: linear-gradient(to right, #f1c40f, #f39c12); /* Gradient background */
+    cursor: pointer; /* Cursor indicates button */
+    transition: background-image 0.3s ease-in-out; /* Smooth transition for hover effect */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+    position: relative;
+    z-index: 10; /* Ensures it's on top */
+}
+
+        .pay-to-play-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            color: red;
+            display: none;
+            text-align: center;
+            z-index: 3;
+            background-color: white;
+        }
+        .mobile-message, .coinbase-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: red;
+            background-color: white;
+            display: none;
+            text-align: center;
+            z-index: 3;
+        }
+        .wrong-chain {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: red;
+            display: none;
+            background-color: white;
+            text-align: center;
+            z-index: 3;
+        }
+        .pay-to-play-message a, .mobile-message a, .coinbase-message a, .wrong-chain a {
+         color: red; /* Makes the hyperlink red */
+         text-decoration: none; /* Removes underline from hyperlinks */
+}
+        .wallet-info, .connect-wallet {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            color: white;
+        }
+
+        .connect-wallet {
+            background-color: #1458f0;
+            padding: 5.6px;
+            font-size: 13.44px; 
+            gap: 6.72px; 
+            display: flex;
+            z-index: 5;
+        }
+          .basedball-docs {
+            background-color: #373535;
+            padding: 5.6px;
+            font-size: 13.44px; 
+            gap: 6.72px; 
+            display: flex;
+            z-index: 5;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            text-decoration: none; 
+            border-radius: 5px;
+            cursor: pointer;
+            align-items: center;
+            color: white;
+          }
+        .connect-wallet img, .wallet-info img {
+            width: 14.4px;
+        }
+        .wallet-info {
+            background-color: #4CAF50;
+            padding: 5.6px;
+            font-size: 13.44px; 
+            gap: 6.72px; 
+            border-radius: 3px;
+            display: flex;
+            color: white;
+        }
+        #degen-basedball-container .game-title {
+            color: #1458f0;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        #degen-basedball-container .welcome-message, #degen-basedball-container .footer-note a, .footer-note {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #1458f0;
+            text-decoration: none;
+        }
+        .welcome-message{
+            font-style: italic;
+        }
+        #degen-basedball-container .game-container {
+            position: relative;
+            width: 100%;
+            max-height: 50px;
+            padding-bottom: 100%;
+            background-color: #fff;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        #base-squares {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect x="90" y="0" width="20" height="20" fill="%231458f0"/><rect x="180" y="90" width="20" height="20" fill="%231458f0"/><path d="M 90,180 H 110 L 115,185 L 100,200 L 85,185 Z" fill="%231458f0"/><rect x="0" y="90" width="20" height="20" fill="%231458f0"/></svg>');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            z-index: 2;
+        }              
+        #first-base-logo {
+            position: absolute;
+            top: calc(48.5% - 10px); /* Adjust based on the base's position */
+            left: calc(76.9% + 90px); /* Adjust based on the base's position */
+            width: 40px; /* Match or adjust to the size of the base */
+            height: 40px; /* Match or adjust to the size of the base */
+            z-index: 3; /* Ensure it's above the base */
+        }       
+        #degentleman-logo {
+            position: absolute;
+            bottom: 30px;
+            width: 175px;
+            left: 72%;
+            z-index: 0; /* Ensure it's above the base */
+        }       
+
+        #second-base-logo {
+            position: absolute;
+            top: calc(1.5%); /* Start with an estimate, then adjust based on the actual position */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, 0); /* Adjust horizontal centering */
+            width: 40px; /* Match or adjust to the size of the base */
+            height: 40px; /* Match or adjust to the size of the base */
+            z-index: 3; /* Ensure it's above the base */
+        }        
+
+        #third-base-logo {
+            position: absolute;
+            top: calc(48.5% - 10px); /* Adjust based on the third base's position */
+            left: calc(1.3%); /* Adjust based on the third base's position */
+            width: 40px; /* Match or adjust to the size of the base */
+            height: 40px; /* Match or adjust to the size of the base */
+            z-index: 3; /* Ensure it's above the base */
+        }
+        
+        .overlay-line {
+            position: absolute;
+            width: 65%; /* Adjust based on your needs */
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Center the line */
+            z-index: 1; /* Ensure it's above the SVG */
+        }
+        
+        .line1 {
+            transform: translate(-15%, -1450%) rotate(45deg); /* Adjust rotation */
+        }
+        
+        .line2 {
+            transform: translate(-15%, 1300%) rotate(-45deg); /* Adjust rotation */
+        }
+        
+        .line3 {
+            transform: translate(-85%, -1450%) rotate(135deg); /* Adjust rotation */
+        }
+        
+        .line4 {
+            transform: translate(-85%, 1300%) rotate(-135deg); /* Adjust rotation */
+        }
+
+        #degen-basedball-container .batter, #degen-basedball-container .runner, #degen-basedball-container .ball {
+            position: absolute;
+        }
+        #degen-basedball-container .batter {
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            z-index: 10000;
+        }
+        #degen-basedball-container .ball {
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            background-color: #1458f0;
+            border-radius: 50%;
+            visibility: hidden;
+            z-index: 9999;
+        }
+        #degen-basedball-container .swing-button {
+            display: block;
+            width: 90%;
+            margin: 20px auto;
+            padding: 10px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #1458f0; 
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #degen-basedball-container .runner {
+            width: 120px; /* or your preferred width */
+            position: absolute;
+            visibility: hidden; /* Initially hidden, shown via JS */
+        }
+        
+        #runner-first {
+            bottom: 40%; /* Adjust based on your layout */
+            right: 5%; /* Adjust based on your layout */
+            z-index: 99;
+        }
+        
+        #runner-second {
+            top: 5%; /* Adjust based on your layout */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%); /* Center horizontally */
+            z-index: 99;
+        }
+        
+        #runner-third {
+            bottom: 40%; /* Adjust based on your layout */
+            left: 5%; /* Adjust based on your layout */
+            z-index: 99;
+        }
+        .confetti {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100;
+            pointer-events: none;
+            background-size: cover;
+        }
+        @keyframes degen-basedball-moveBall {
+            to {
+                bottom: var(--end-bottom);
+                left: var(--end-left);
+            }
+        }
+        #degen-basedball-container .result-display, #degen-basedball-container .score-tracker, #degen-basedball-container .outs-tracker, .games-tracker, .score-display, .out-display {
+            color: #1458f0;
+            font-size: 16px;
+            position: absolute;
+        }
+        .score-display {
+            font-size: 30px;
+            text-align: center;
+            display: none;
+            position: absolute;
+            top: calc(48% - 20px); /* Adjusted to lift it up a bit */
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .out-display {
+            font-size: 24px;
+            text-align: center;
+            display: none;
+            position: absolute;
+            top: calc(50% + 30px); /* Adjusted to push it down a bit */
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #degen-basedball-container .team {
+    position: absolute;
+    top: 22%; /* Adjust this value to position it right above the middle icon */
+    left: 50%;
+    transform: translate(-50%, -100%); /* Adjusts the placement exactly above the middle icon */
+    font-size: 12px; /* Example font size, adjust as needed */
+    color: #373535; /* Example color, adjust as needed */ 
+    font-style: italic;
+    z-index: 2; /* Ensures it appears above the background but below interactive elements */
+}
+
+.earnings {
+        position: absolute;
+        right: 10px;
+        color: #1458f0; /* Blue color to match the design */
+        font-size: 14px; /* Adjust based on your design */
+        top: 50px;
+}
+.burnings {
+        position: absolute;
+        right: 10px;
+        color: #1458f0; /* Blue color to match the design */
+        font-size: 14px; /* Adjust based on your design */
+        top: 70px;
+}
+
+        
+    .degen-pool, .play-bonus, .grand-slam-jackpot {
+        position: absolute;
+        left: 10px;
+        color: #1458f0; /* Blue color to match the design */
+        font-size: 14px; /* Adjust based on your design */
+    }
+    .degen-pool {
+        top: 10px;
+    }
+    .play-bonus {
+        top: 50px; /* Adjust the top value based on the actual height of your degen-pool div */
+    }
+    .grand-slam-jackpot {
+        top: 30px;
+    }
+.claim-button {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    padding: 10px 20px; /* Same padding as the pay button */
+    font-size: 16px;
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    background-image: linear-gradient(to right, #f1c40f, #f39c12); /* Gradient background */
+    cursor: pointer; /* Cursor indicates button */
+    transition: background-image 0.3s ease-in-out; /* Smooth transition for hover effect */
+    z-index: 10; /* Ensures it's on top */
+}
+    #degenDisplay {
+        display: none; /* Hidden by default */
+        position: absolute;
+        color: #f58216;
+        left: 10px;
+        bottom: 80px;
+        font-size: 40px; /* Example font size, adjust as needed */
+        z-index: 100;
+    }
+
+        .out-display {
+            color: red;
+            font-size: 32px;
+            display: none;
+        }
+        .home-plate {
+            position: absolute;
+            bottom: 3%;
+            left: 50%;
+            width: 35px;
+            transform: translateX(-50%);
+            z-index: 3;
+        }
+        #degen-basedball-container .result-display {
+            bottom: 10px;
+            right: 10px;
+        }
+        #degen-basedball-container .score-tracker {
+            bottom: 10px;
+            left: 10px;
+        }
+        
+        #degen-basedball-container .outs-tracker {
+            bottom: 10px;
+            left: 60%;
+        }
+        #degen-basedball-container .games-tracker {
+            bottom: 10px;
+            left: 71%;
+        }
+        .game-over {
+            color: red;
+            font-size: 24px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            background-color: white;
+        }
+        .play-ball { 
+            color: #67bd45;
+            font-size: 24px;
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            background-color: white;
+        }
+        /* Added icon */
+        #degen-basedball-container .middle-icon {
+            position: absolute;
+            bottom: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            z-index: 2;
+        }
+        /* Payment processing message and loading bar */
+        .payment-processing-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -70%);
+            font-size: 20px;
+            color: green;
+            display: none;
+            z-index: 4;
+        }
+        .loading-bar {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 20px;
+            background-color: #ddd;
+            display: none;
+            border-radius: 10px;
+            z-index: 4;
+        }
+        .reset-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none; /* Keep it initially hidden */
+            width: 45%;
+            margin: 0; /* Remove margin as it's now absolutely positioned */
+            padding: 10px;
+            font-size: 16px;
+            font-style: italic;
+            color: #fff;
+            background-color: #1458f0; 
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        
+        
+        .loading-bar-fill {
+            height: 100%;
+            width: 0%;
+            background-color: green;
+            border-radius: 10px;
+            animation: fillLoadingBar 2s linear forwards;
+        }
+        @keyframes fillLoadingBar {
+            to { width: 100%; }
+        }
+
+        @media (max-width: 600px) {
+            .game-title, .footer-note {
+                font-size: 10px; /* Reduce font size for mobile */
+            }
+            .game-title {
+                 margin: 40px 0;
+            }
+            .welcome-message {
+                font-size: 9px;
+            }
+            #degen-basedball-container .game-container {
+                max-height: 50px;
+            }
+            .degen-pool, .play-bonus, .grand-slam-jackpot, .earnings, .burnings {
+               font-size: 8px; 
+               }
+            .pay-button, .swing-button, .claim-button {
+                font-size: 10px; /* Reduce button font size */
+                padding: 8px; /* Adjust padding */
+            }
+            .wallet-info, .connect-wallet, .basedball-docs {
+                font-size: 8px; /* Adjust font size */
+                padding: 2px; /* Adjust padding */
+                gap: 2px; /* Reduce gap */
+            }
+            .wallet-info img, .connect-wallet img {
+                width: 10px; /* Reduce icon size */
+            }
+            #degen-basedball-container .team {
+                top: 40%;
+            }
+            #runner-first {
+                transform: translateX(0%) translateY(20%) scale(0.5) !important;
+                right: -10%;
+            }
+            #runner-second {
+                transform: translateX(-50%) translateY(10%) scale(0.5) !important;
+                top: -10%;
+            }
+            #runner-third {
+                transform: translateX(-50%) translateY(20%) scale(0.5) !important;
+            }
+            .batter {
+                transform: translateX(-50%) translateY(20%) scale(0.5) !important;
+            }
+            .ball, .home-plate, #first-base-logo, #second-base-logo, #third-base-logo {
+                width: 120px; /* Keep other sizes unchanged */
+            }
+            .overlay-line {
+                width: 60%; /* Adjust overlay line size */
+            }
+            #degen-basedball-container .result-display, #degen-basedball-container .score-tracker, #degen-basedball-container .outs-tracker, .games-tracker, .score-display, .out-display {
+                font-size: 8px; /* Adjust font size */
+            }
+            .score-display, .out-display, {
+                font-size: 20px; /* Adjust score and out display font size */
+                z-index: 101;
+            }
+            
+            .pay-to-play-message, .game-over, .play-ball {
+                font-size: 20px; /* Adjust score and out display font size */
+                z-index: 101;
+                background-color: white;
+            }
+            .mobile-message, .coinbase-message, .wrong-chain {
+                font-size: 8px;
+            }
+            .mobile-message {
+                font-size: 12px;
+            }
+            #degenDisplay {
+                font-size: 24px; /* Adjust degen display font size */
+            }
+            .payment-processing-message, .loading-bar {
+                font-size: 16px; /* Adjust font size */
+                width: 70%; /* Adjust width */
+            }
+            .loading-bar-fill {
+                /* No change needed here, but you can adjust if necessary */
+            }
+            #degentleman-logo {
+            position: absolute;
+            bottom: 30px;
+            width: 110px;
+            left: 69%;
+            z-index: 0; 
+            }
+            #first-base-logo {
+                top: calc(50% - 9px); /* Adjust based on the base's position */
+                left: calc(91.7%); /* Adjust based on the base's position */
+                width: 20px; /* Adjust for mobile */
+                height: 20px; /* Adjust for mobile */
+            }
+        
+            #second-base-logo {
+                top: calc(2% - 1px); /* Adjust for mobile */
+                left: 50%; /* Center horizontally */
+                transform: translate(-50%, 0); /* Adjust horizontal centering */
+                width: 20px; /* Adjust for mobile */
+                height: 20px; /* Adjust for mobile */
+            }
+        
+            #third-base-logo {
+                top: calc(50% - 9px); /* Adjust based on the base's position */
+                left: calc(2%); /* Adjust for mobile */
+                width: 20px; /* Adjust for mobile */
+                height: 20px; /* Adjust for mobile */
+            }
+            .home-plate {
+                bottom: 2.75%; /* Adjust as necessary for mobile alignment */
+                left: 50%; /* Center horizontally, adjust if necessary */
+                width: 20px; /* Adjust for mobile */
+                height: auto; /* Maintain aspect ratio */
+                transform: translateX(-50%); /* Center horizontally */
+            }
+            .middle-icon {
+                top: 47%; /* Center vertically, adjust if necessary */
+                left: 50%; /* Center horizontally */
+                transform: translate(-50%, -50%); /* Centering adjustment */
+                max-width: 75px; /* Adjust for mobile */
+                z-index: 2;
+            }
+            .reset-button {
+                font-size: 14px; /* Adjust button font size */
+                padding: 8px; /* Adjust padding */
+            }
+        }
+        
+    </style>
+</head>
+<body>
+
+<div id="degen-basedball-container">
+    <div class="connect-wallet" id="connectWalletButton">
+        <img src="https://cdn.iconscout.com/icon/free/png-256/metamask-2728406-2261817.png" alt="MetaMask Icon"> Connect Wallet
+    </div>
+    <div class="wallet-info" id="walletInfo" style="display: none;">$DEGEN: --</div>
+    <a href="https://advantage-blockchain.gitbook.io/basedball" class="basedball-docs" id="basedballDocs">📚 basedball docs</a>
+    <div class="game-title"><img src="https://em-content.zobj.net/source/apple/391/baseball_26be.png" alt="Baseball Emoji" style="width: 24px; vertical-align: middle;"> basedball <img src="https://em-content.zobj.net/source/apple/391/baseball_26be.png" alt="Baseball Emoji" style="width: 24px; vertical-align: middle;"></div>
+    <div class="welcome-message">Use 🎩 DEGEN to Play Ball! Earn & Burn on Degen L3 🕹🔥</div>
+    <div class="game-container">
+     <button class="reset-button" id="resetGameButton" onclick="resetGame()">CLICK HERE to try again slugger!</button>
+        <img src="https://i.pinimg.com/originals/26/bb/bb/26bbbb216cd1cc02a1e7a024d5616907.png" alt="Batter" class="batter">
+        <img src="https://poromi-free.net/wp-content/uploads/2019/08/04-01-190808-run.png" alt="Runner on First" class="runner" id="runner-first">
+        <img src="https://poromi-free.net/wp-content/uploads/2019/08/04-01-190808-run.png" alt="Runner on Second" class="runner" id="runner-second">
+        <img src="https://poromi-free.net/wp-content/uploads/2019/08/04-01-190808-run.png" alt="Runner on Third" class="runner" id="runner-third">
+        <div class="ball"></div>
+        <div class="confetti" id="confetti"></div>
+        <div class="degen-pool" id="degenPool">🎩DEGEN Pool: -- </div>
+        <div class="play-bonus" id="playBonus">🕹PLAY Earned: -- </div>
+        <div class="grand-slam-jackpot" id="grandSlamJackpot">🍾Grandslam: -- </div>
+        <button class="claim-button" id="claimRewardsButton">CLAIM</button>
+        <div class="earnings" id="degenEarnings">🎩Degen Earned: -- </div>
+        <div class="burnings" id="degenBurnings">🔥Degen Burned: -- </div>
+        <div class="result-display" id="result-display">Hit!</div>
+        <div class="score-tracker" id="score-tracker">Runs: 0</div>
+        <div class="outs-tracker" id="outs-tracker">Outs: 0</div>
+        <img src="https://static.wixstatic.com/media/0c2fd8_cff1d89fa72346c2870fa06d2451508a~mv2.png/v1/fill/w_597,h_599,al_c,lg_1,q_85,enc_auto/baseball%20Man.png" alt="degentleman" id="degentleman-logo">
+        <div class="games-tracker" id="games-tracker">Games: 0</div>
+        <div class="game-over" id="game-over">GAME OVER</div>
+        <div class="play-ball" id="play-ball">PLAY BALL</div>
+        <div class="out-display" id="out-display">OUT!</div>
+        <div id="base-squares"></div>
+        <img src="https://i.imgur.com/iWYMyKC.png" alt="Home Plate" class="home-plate">
+        <div class="score-display" id="score-display"></div>
+        <div id="degenDisplay" style="display: none;">+0 $DEGEN 🎩</div>
+        <img src="https://i.imgur.com/cQ7GSUt.png" alt="base logo" id="first-base-logo">
+        <img src="https://i.imgur.com/cV6Stij.png" alt="op logo" id="second-base-logo">
+        <img src="https://i.imgur.com/00BJH8d.png" alt="eth logo" id="third-base-logo">
+        <img src="https://static.wixstatic.com/media/0c2fd8_3a0845d8604746f799e04a8ec439cd1d~mv2.png" alt="Line 1" class="overlay-line line1">
+        <img src="https://static.wixstatic.com/media/0c2fd8_3a0845d8604746f799e04a8ec439cd1d~mv2.png" alt="Line 2" class="overlay-line line2">
+        <img src="https://static.wixstatic.com/media/0c2fd8_3a0845d8604746f799e04a8ec439cd1d~mv2.png" alt="Line 3" class="overlay-line line3">
+        <img src="https://static.wixstatic.com/media/0c2fd8_3a0845d8604746f799e04a8ec439cd1d~mv2.png" alt="Line 4" class="overlay-line line4">        
+        <div class="team" id="team">Team:</div>
+        <img src="https://static.wixstatic.com/media/546e31_cab24f93f05e4b4c9b627683fc7f1229~mv2.png/v1/crop/x_0,y_13,w_7987,h_3714/fill/w_1377,h_639,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/AB-Logo-Website-HomeHeader-01.png" alt="Middle Icon" class="middle-icon">
+        <div class="pay-to-play-message" id="payToPlayMessage">Please use DEGEN to play.</div>
+        <div class="mobile-message" id="mobile-message" onclick="showMobileMessageDyl()" style="cursor: pointer;">Click here to play on mobile.</div>
+        <div class="coinbase-message" id="coinbase-message"><a href="https://www.dylmusic.com/testing-onchain">If you see this switch to DEGEN chain & click here to refresh the game.</a></div>
+        <div class="wrong-chain" id="wrong-chain"><a href="https://www.dylmusic.com/testing-onchain">If you see this switch to DEGEN chain.</a></div>
+    </div>
+
+    <div class="button-area">
+    <select id="gameType" class="game-type-dropdown">
+        <option value="game1">10 DEGEN</option>
+    <option value="game100" disabled style="color: grey;">100 DEGEN</option>
+    <option value="game1000" disabled style="color: grey;">1,000 DEGEN</option>
+    <option value="game10000" disabled style="color: grey;">10,000 DEGEN</option>
+    </select>
+    <select id="gameCount" class="game-count-dropdown">
+    <option value="10">10 Games</option>
+        <option value="1">1 Game</option>
+    </select>
+    <button class="pay-button">USE 🎩DEGEN</button>
+</div>
+    <button class="swing-button" onclick="swingForHit()">Swing</button>
+    <div class="payment-processing-message" id="paymentProcessingMessage">
+    <img src="https://gifdb.com/images/high/pixelated-animated-hot-dog-3x9za3ltfsta19nh.gif" alt="Processing..." style="width: 50px; height: 50px; vertical-align: middle;">
+    Confirming transaction...
+</div>
+    <div class="loading-bar" id="loadingBar">
+        <div class="loading-bar-fill"></div>
+    </div>
+<div class="footer-note" style="font-size: 65%;"><a href="https://warpcast.com/~/channel/basedball" target="_blank">[BETA] SZN.0 🛠️report bugs in /baseball for $DEGEN🛠️</a></div>
+</div>
+
+<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+<script>
+
+function calculateCost(gameType, gameCount) {
+    var baseCost = 10000; // Base cost for game1 is 10 finney
+    var multiplier = parseInt(gameType.replace('game', ''), 10);
+    return baseCost * multiplier * gameCount;
+}
+
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    const signer = provider.getSigner();
+                    const account = await signer.getAddress();
+                    updateDegenPool();
+                    showTokenBalance(account);
+
+                } catch (error) {
+                    console.error('Could not connect to wallet:', error);
+                    location.reload(true);
+                }
+            } else {
+                document.getElementById("mobile-message").style.display = "block";
+                console.log('MetaMask is not installed');
+            }
+        }
+
+async function showTokenBalance(account) {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const balance = await provider.getBalance(account);
+    const formattedBalance = ethers.utils.formatEther(balance);
+    updateDegenPool();
+
+    // Convert formattedBalance to a number and format it to show only two decimal places
+    const balanceToTwoDecimals = Number(formattedBalance).toFixed(2);
+
+    // Make sure walletInfoDiv is properly defined in this scope
+    const walletInfoDiv = document.getElementById('walletInfo');
+    walletInfoDiv.textContent = `🎩DEGEN: ${balanceToTwoDecimals}`;
+    walletInfoDiv.style.display = 'flex';
+
+    // Also ensure that connectWalletButton is defined or accessible in this scope
+    const connectWalletButton = document.getElementById('connectWalletButton'); // Assuming there's a button with this id
+    connectWalletButton.style.display = 'none';
+    walletInfoDiv.style.color = '#fff'; 
+}
+
+
+
+const hitTypes = {
+    0: { name: "Out", bottom: "15%", left: "50%" }, // Fixed at 50%
+    1: { name: "Single", bottom: "40%", left: `${35 + Math.random() * 30}%` }, // Random between 35% and 65%
+    2: { name: "Double", bottom: "60%", left: `${30 + Math.random() * 40}%` }, // Random between 30% and 70%
+    3: { name: "Triple", bottom: "80%", left: `${25 + Math.random() * 50}%` }, // Random between 25% and 75%
+    4: { name: "Home Run", bottom: "100%", left: `${20 + Math.random() * 60}%` } // Random between 20% and 80%
+};
+
+    let hash = ""
+    let addy = ""
+    let gamesRemaining = 0;
+    let canSwing = true;
+    let bases = [false, false, false, false];
+    let runs = 0;
+    let previousRuns = 0;
+    let outs = 0;
+    let gameIsOver = false;
+    let hasPaid = false;
+    let gameResults = [];
+    let currentSwingIndex = 0;
+    let currentGameIndex = 0;
+    let gameScores = [];
+    let playerAddresses = [];
+
+async function payDegen(gameType, gameCount) {
+    const paymentProcessingMessage = document.getElementById('paymentProcessingMessage');
+    const loadingBar = document.getElementById('loadingBar');
+    const loadingBarFill = document.querySelector('.loading-bar-fill');
+    const walletInfoDiv = document.getElementById('walletInfo');
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    document.getElementById('resetGameButton').style.display = 'none';
+    
+    const contractAddress = '0xa7135971fA1aa610384EF81858dcb4d91eF53811'; 
+const contractABI = [
+    "function game1() external payable",
+    "function game10() external payable",
+    "function game100() external payable",
+    "function game1000() external payable",
+    "function game10000() external payable",
+    "function claimRewards() public",
+    "function withdraw() external",
+    "event GameResult(address indexed player, uint256[30] result, uint256 score)",
+    "event RewardScoreUpdated(address indexed player, uint256 newRewardScore)",
+    "event HotdogsUpdated(address indexed player, uint256 newHotdogsTotal)",
+    "event GamesPlayedUpdated(address indexed player, uint256 totalGamesPlayed)",
+    "event UnclaimedGamesUpdated(address indexed player, uint256 unclaimedGamesPlayed)",
+    "event RewardClaimed(address indexed player, uint256 rewardAmount)"
+];
+
+    const baseballGameContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+    const baseCost = "10000000000000000000"; // Use string to ensure precision
+    const multiplier = {
+        'game1': 1,
+        'game10': 10,
+        'game100': 100,
+        'game1000': 1000,
+        'game10000': 10000
+    }[gameType] || 1;
+    const totalCost = ethers.utils.parseUnits((parseInt(baseCost) * multiplier * gameCount).toString(), 'wei');
+
+    try {
+        paymentProcessingMessage.style.display = 'block';
+        loadingBar.style.display = 'block';
+        loadingBarFill.style.animation = 'fillLoadingBar 2s linear forwards';
+
+        // Estimate the gas limit with some additional buffer
+        const estimatedGasLimit = await baseballGameContract.estimateGas[gameType]({ value: totalCost });
+        const increasedGasLimit = estimatedGasLimit.mul(ethers.BigNumber.from(2)); // Increasing gas limit by 100%
+
+        // Sending the transaction with increased gas limit
+        const tx = await baseballGameContract[gameType]({
+            value: totalCost,
+            gasLimit: increasedGasLimit.toString() // Make sure to convert BigNumber to string if required
+        });
+
+        const receipt = await tx.wait();
+
+const gameResultEvents = receipt.events.filter(event => event.event === 'GameResult');
+gameResults = gameResultEvents.map(event => event.args.result.map(Number)); // Convert string array to number array
+playerAddresses = gameResultEvents.map(event => event.args.player); // Store player addresses
+gameScores = gameResultEvents.map(event => parseInt(event.args.score)); // Convert string score to integer
+
+// Log the number of games detected and their details
+console.log(`Detected ${gameResults.length} game(s) from the transaction.`);
+gameResults.forEach((resultArray, index) => {
+    console.log(`Game ${index + 1}: Player Address: ${playerAddresses[index]}, Result array length - ${resultArray.length}, Score: ${gameScores[index]}`);
+});
+
+        paymentProcessingMessage.style.display = 'none';
+        loadingBar.style.display = 'none';
+        hasPaid = true;
+        gamesRemaining = gameCount;
+        updateGamesRemaining();
+        setTimeout(() => { document.getElementById('play-ball').style.display = 'block'; setTimeout(() => document.getElementById('play-ball').style.display = 'none', 2000); }, 0);
+        walletInfoDiv.textContent = `Payment successful. You can play ${gameCount} games. Last Game Score: ${gameResults[gameResults.length - 1].args.score}`;
+    } catch (error) {
+        console.error('Payment failed:', error);
+        // walletInfoDiv.textContent = 'Payment failed. Please try again.';
+        paymentProcessingMessage.style.display = 'none';
+        loadingBar.style.display = 'none';
+    }
+}
+
+            function showMobileMessageDyl() {
+                const overlay = document.createElement('div');
+                overlay.style.position = 'fixed';
+overlay.style.top = '50%';  // Center vertically in the viewport
+overlay.style.left = '50%';  // Center horizontally in the viewport
+overlay.style.width = '60%';
+overlay.style.height = '40%';
+overlay.style.transform = 'translate(-50%, -50%)';  // Adjust to center based on its own dimensions
+overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+overlay.style.display = 'flex';
+overlay.style.justifyContent = 'center';
+overlay.style.alignItems = 'center';
+overlay.style.zIndex = '10000';
+
+                const messageContainer = document.createElement('div');
+                messageContainer.innerHTML = `
+                    <div style="background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); text-align: center;">
+                        <img src="https://static.wixstatic.com/media/0c2fd8_cff1d89fa72346c2870fa06d2451508a~mv2.png/v1/fill/w_597,h_599,al_c,lg_1,q_85,enc_auto/baseball%20Man.png" alt="Dyl Profile" style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 20px;">
+                        <p>Select Wallet:</p>
+                        <a href="https://metamask.app.link/dapp/www.dylmusic.com/testing-onchain" target="_blank" style="display: inline-block; background-color: #ffffff; color: #007bff; padding: 10px 20px; border-radius: 20px; font-size: 16px; font-weight: bold; text-decoration: none; transition: all 0.2s ease-in-out; margin-bottom: 10px;">Open in MetaMask</a>
+                        <br>
+                        <a href="https://go.cb-w.com/dapp?cb_url=https%3A%2F%2Fwww.dylmusic.com/testing-onchain" target="_blank" style="display: inline-block; background-color: #ffffff; color: #007bff; padding: 10px 20px; border-radius: 20px; font-size: 16px; font-weight: bold; text-decoration: none; transition: all 0.2s ease-in-out;">Open in Coinbase Wallet</a>
+                    </div>
+                `;
+                overlay.appendChild(messageContainer);
+
+                document.body.appendChild(overlay);
+
+                overlay.addEventListener('click', function() {
+                    document.body.removeChild(overlay);
+                });
+            }
+
+function swingForHit() {
+    const payToPlayMessage = document.getElementById('payToPlayMessage');
+    const gameOverDisplay = document.getElementById('game-over');
+    const ball = document.querySelector('.ball');
+    const resultDisplay = document.getElementById('result-display');
+    const scoreTracker = document.getElementById('score-tracker');
+    const outsTracker = document.getElementById('outs-tracker');
+    const scoreDisplay = document.getElementById('score-display');
+    const outDisplay = document.getElementById('out-display');
+    const confetti = document.getElementById('confetti');
+    document.getElementById('play-ball').style.display = 'none';
+
+    if (gameIsOver || outs >= 3) {
+        gameOverDisplay.style.display = 'block';
+        return;
+    }
+
+    if (!hasPaid) {
+        payToPlayMessage.style.display = 'block';
+        setTimeout(() => { payToPlayMessage.style.display = 'none'; }, 3000);
+        return;
+    }
+
+    if (!canSwing) return;
+    canSwing = false;
+    setTimeout(() => { canSwing = true; }, 1200);
+
+    if (currentGameIndex < gameResults.length && currentSwingIndex < gameResults[currentGameIndex].length) {
+        const hitType = hitTypes[gameResults[currentGameIndex][currentSwingIndex++]];
+        updateDegenPool();
+        previousRuns = runs;
+
+        setTimeout(() => {
+            if (hitType.name !== "Out") {
+                canSwing = false;
+                setTimeout(() => canSwing = true, 1200);
+                ball.style.setProperty('--end-bottom', hitType.bottom);
+                ball.style.setProperty('--end-left', `${35 + Math.random() * 30}%`);
+                ball.style.animation = 'none';
+                ball.style.visibility = 'visible';
+                setTimeout(() => {
+                    ball.style.animation = 'degen-basedball-moveBall 0.75s forwards';
+                    setTimeout(() => {
+                        ball.style.visibility = 'hidden';
+                        updateBases(hitType.name);
+                        updateRunners();
+                        resultDisplay.textContent = hitType.name;
+                        scoreTracker.textContent = "Runs: " + runs;
+
+                        if (runs - previousRuns > 0) {
+                            canSwing = false;
+                            setTimeout(() => {
+                                scoreDisplay.textContent = (runs - previousRuns) + " RUN" + ((runs - previousRuns) > 1 ? "S" : "");
+                                scoreDisplay.style.display = 'block';
+                                const degenDisplay = document.getElementById('degenDisplay');
+                                degenDisplay.textContent = `+ ${2 * (runs - previousRuns)} $DEGEN`;
+                                degenDisplay.style.display = 'block';
+
+                                setTimeout(() => {
+                                    scoreDisplay.style.display = 'none';
+                                    degenDisplay.style.display = 'none';
+                                    canSwing = true;
+                                }, 1200);
+                            }, 0);
+                        }
+if (hitType.name === "Home Run") {
+    confetti.style.backgroundImage = 'url(https://i.pinimg.com/originals/fd/d0/0e/fdd00eff2cfe977daed3584f56eafbc9.gif)';
+    confetti.style.display = 'block';
+    setTimeout(() => { confetti.style.display = 'none'; }, 2000);
+
+    if ((runs - previousRuns) === 4) {
+        scoreDisplay.textContent = "GRAND SLAM!!!";
+    } else {
+        scoreDisplay.textContent = "HOME RUN!";
+    }
+    scoreDisplay.style.display = 'block';
+    setTimeout(() => { scoreDisplay.style.display = 'none'; }, 2000);
+}
+                    }, 1200);
+                }, 10);
+            } else {
+                outs++;
+                canSwing = false;
+                setTimeout(() => canSwing = true, 1200);
+                outsTracker.textContent = "Outs: " + outs;
+                outDisplay.textContent = "OUT!";
+                outDisplay.style.display = 'block';
+                setTimeout(() => {
+                    outDisplay.style.display = 'none';
+                    if (outs >= 3) {
+                        gameOverDisplay.style.display = 'block';
+                        gameIsOver = true;
+                        updateDegenPool();
+                        gamesRemaining = gameResults.length - (currentGameIndex + 1);
+                        updateGamesRemaining();
+                        if (gamesRemaining === 0) {
+    gameScores = [];
+                        updateDegenPool();
+                        setTimeout(() => document.getElementById('resetGameButton').style.display = 'block', 500);
+}
+                        if (currentGameIndex < gameResults.length - 1) {
+                            currentGameIndex++;
+                            updateDegenPool();
+                            nextGame();
+                        }
+                    }
+                }, 2000);
+            }
+        }, 0);
+    } else {
+        if (currentGameIndex < gameResults.length - 1) {
+            currentGameIndex++;
+            updateDegenPool();
+            nextGame();
+        } else {
+            console.log('No more results available in gameResults array.');
+        }
+    }
+}
+
+
+
+
+function nextGame() {
+    // Display game over message and set up a delay before resetting the game
+    // document.getElementById('game-over').textContent = 'Next game starting in 3 seconds...';
+    document.getElementById('game-over').style.display = 'block';
+    document.getElementById('resetGameButton').style.display = 'none';
+    
+
+    setTimeout(function() {
+        canSwing = true;
+        bases = [false, false, false, false];
+        runs = 0;
+        previousRuns = 0;
+        outs = 0;
+        gameIsOver = false;
+        currentSwingIndex = 0; // Reset the index to the start of the array
+        updateDegenPool();
+
+        // Reset UI elements to state for the new game
+        document.getElementById('runner-first').style.visibility = 'hidden';
+        document.getElementById('runner-second').style.visibility = 'hidden';
+        document.getElementById('runner-third').style.visibility = 'hidden';
+        document.querySelector('.ball').style.visibility = 'hidden !important';
+        document.getElementById('score-tracker').textContent = "Runs: 0";
+        document.getElementById('outs-tracker').textContent = "Outs: 0";
+        document.getElementById('game-over').style.display = 'none';
+        document.getElementById('resetGameButton').style.display = 'none';
+    }, 1200); 
+ setTimeout(() => { document.getElementById('play-ball').style.display = 'block'; }, 1000);
+}
+
+function updateGamesRemaining() {
+    document.getElementById('games-tracker').textContent = 'Games: ' + gamesRemaining;
+}
+
+
+
+    function updateBases(hitTypeName) {
+        let newBases = [false, false, false, false];
+        switch(hitTypeName) {
+            case "Single":
+                for (let i = 2; i >= 0; i--) {
+                    if (bases[i]) {
+                        if (i === 2) runs++;
+                        else newBases[i + 1] = true;
+                    }
+                }
+                newBases[0] = true;
+                break;
+            case "Double":
+                for (let i = 2; i >= 0; i--) {
+                    if (bases[i]) {
+                        if (i >= 1) runs++;
+                        else newBases[i + 2] = true;
+                    }
+                }
+                newBases[1] = true;
+                break;
+            case "Triple":
+                for (let i = 2; i >= 0; i--) {
+                    if (bases[i]) runs++;
+                }
+                newBases[2] = true;
+                break;
+            case "Home Run":
+                runs += 1 + bases.filter(Boolean).length;
+                break;
+        }
+        bases = newBases;
+    }
+
+    function updateRunners() {
+        document.getElementById('runner-first').style.visibility = bases[0] ? 'visible' : 'hidden';
+        document.getElementById('runner-second').style.visibility = bases[1] ? 'visible' : 'hidden';
+        document.getElementById('runner-third').style.visibility = bases[2] ? 'visible' : 'hidden';
+    }
+
+
+
+async function updateDegenPool() {
+    const contractAddress = '0xa7135971fA1aa610384EF81858dcb4d91eF53811';
+    const contractABI = [
+        "function rewardscore(address) view returns (uint256)",
+        "function totalGames(address) view returns (uint256)",
+        "function HOTDOGS(address) view returns (uint256)",
+        "function game1() external payable",
+        "function game10() external payable",
+        "function game100() external payable",
+        "function game1000() external payable",
+        "function game10000() external payable",
+        "function claimRewards() public",
+        "function withdraw() external",
+        // Include all other functions and events as per your original ABI
+    ];
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const contract = new ethers.Contract(contractAddress, contractABI, provider);
+    const userAddress = await provider.getSigner().getAddress();
+
+    try {
+        const balanceWei = await provider.getBalance(contractAddress);
+        const balanceEth = ethers.utils.formatEther(balanceWei); 
+        const grandSlamJackpot = (parseFloat(balanceEth) * 0.001).toFixed(2);
+        wrongchain();
+        const balanceFixed = parseInt(balanceEth);
+           if (balanceFixed > 0) {
+    document.getElementById("coinbase-message").style.display = "none";
+}
+async function wrongchain() {
+    try {
+        const network = await provider.getNetwork(); // Get the network details
+        const chainId = network.chainId;
+        if (chainId === !66666666) {
+            document.getElementById("wrong-chain").style.display = "block";
+        } else {
+            document.getElementById("wrong-chain").style.display = "none";
+        }
+    } catch (error) {
+        console.error("Error fetching the chain ID:", error);
+        document.getElementById("wrong-chain").style.display = "none";
+    }
+}
+       
+        document.getElementById('degenPool').textContent = `🎩 DEGEN Pool: ${balanceFixed} DEGEN`;
+        document.getElementById('grandSlamJackpot').textContent = `🍾 Grandslam: ${grandSlamJackpot} DEGEN`;
+    } catch (error) {
+        console.error('Error fetching contract balance:', error);
+        document.getElementById('degenPool').textContent = 'Error fetching balance';
+        return; // Exit if balance fetch fails
+    }
+
+try {
+    const currentRewardScore = await contract.rewardscore(userAddress);
+    const currentHotdogs = await contract.HOTDOGS(userAddress);
+    const totalGamesUserPlayed = await contract.totalGames(userAddress);
+    console.log("Total Games Played:", totalGamesUserPlayed);
+const degenEarnings = currentRewardScore
+    .sub(gameScores.reduce((acc, sumScores) => acc + sumScores, 0)) // Subtract the total of all game scores.
+    .add(gameScores.slice(0, currentGameIndex).reduce((acc, sumScores) => acc + sumScores, 0)) 
+    .mul(2)
+    .toString();
+    const degenBurnings = currentHotdogs.toString();
+    document.getElementById('playBonus').textContent = `🕹 PLAY Earned: ${totalGamesUserPlayed*10} PLAY`;
+    document.getElementById('degenEarnings').textContent = `🎩 Earned: ${degenEarnings} DEGEN`;
+    document.getElementById('degenBurnings').textContent = `🔥 Burned: ${degenBurnings} DEGEN`;
+} catch (error) {
+    console.error('Error retrieving data from contract:', error);
+    document.getElementById('degenEarnings').textContent = `🎩 Degen Earned: Connect`;
+    document.getElementById('degenBurnings').textContent = `🔥 Degen Burned: Connect`;
+}
+}
+
+
+    function resetGame() {
+        canSwing = true;
+        bases = [false, false, false, false];
+        runs = 0;
+        previousRuns = 0;
+        outs = 0;
+        gameIsOver = false;
+        hasPaid = false;
+        gameResults = []; // Reset the game results array
+        gameScores = [];
+        currentSwingIndex = 0;
+        currentGameIndex = 0;
+        gamesRemaining = 0
+        updateGamesRemaining();
+        updateDegenPool();
+
+    
+        // Reset UI elements to their initial state
+        document.getElementById('runner-first').style.visibility = 'hidden';
+        document.getElementById('runner-second').style.visibility = 'hidden';
+        document.getElementById('runner-third').style.visibility = 'hidden';
+        document.querySelector('.ball').style.visibility = 'hidden !important';
+        document.getElementById('score-tracker').textContent = "Runs: 0";
+        document.getElementById('outs-tracker').textContent = "Outs: 0";
+        document.getElementById('game-over').style.display = 'none';
+        document.querySelector('.ball').style.visibility = 'hidden !important';
+        document.getElementById('resetGameButton').style.display = 'none';
+        document.querySelector('.pay-button').disabled = false;
+        document.querySelector('.pay-button').style.opacity = 1;
+        // Optional: If you are showing transaction success/failure messages, clear them too
+        document.getElementById('walletInfo').textContent = '🎩 DEGEN: --';
+    }
+
+async function claimRewards() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send('eth_requestAccounts', []); // Request account access if needed
+    const signer = provider.getSigner();
+    updateDegenPool();
+
+    const contractAddress = '0xa7135971fA1aa610384EF81858dcb4d91eF53811'; // Replace with your contract address
+    const contractABI = [
+        "function claimRewards() public"
+    ];
+    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+    try {
+        const tx = await contract.claimRewards();
+        console.log('Transaction sent:', tx);
+        const receipt = await tx.wait();
+        console.log('Transaction confirmed:', receipt);
+    } catch (error) {
+        console.error('Error claiming rewards:', error);
+    }
+    updateDegenPool();
+}
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+  //  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+   //  if (isMobile) {
+   //      showMobileMessageDyl();
+   //  }
+
+        document.getElementById('mobile-message').addEventListener('click', function(event) {
+        showMobileMessageDyl();
+    });
+
+
+            if (!window.ethereum) {
+               setTimeout(showMobileMessageDyl, 1500);
+               document.getElementById("mobile-message").style.display = "block";
+    }
+        const swingButton = document.querySelector('.swing-button');
+
+if (window.ethereum) {
+document.getElementById("coinbase-message").style.display = "block";
+
+}
+        updateDegenPool();
+
+        if (swingButton) {
+            swingButton.addEventListener('click', swingForHit);
+        } else {
+            console.error('Swing button not found!');
+        }
+        const connectWalletButton = document.getElementById('connectWalletButton');
+    if (connectWalletButton) {
+        connectWalletButton.addEventListener('click', connectWallet);
+    } else {
+        console.error('Connect Wallet button not found!');
+    }
+
+        // Setup for Pay Button
+        const payButton = document.querySelector('.pay-button');
+        if (payButton) {
+            payButton.addEventListener('click', function() {
+                const gameType = document.getElementById('gameType').value;
+                const gameCount = parseInt(document.getElementById('gameCount').value, 10);
+                console.log('Pay button clicked: Game Type =', gameType, ', Game Count =', gameCount);
+                payDegen(gameType, gameCount);
+            });
+        } else {
+            console.error('Pay button not found!');
+        }
+
+            const claimRewardsButton = document.getElementById('claimRewardsButton');
+    if (claimRewardsButton) {
+        claimRewardsButton.addEventListener('click', claimRewards);
+    } else {
+        console.error('Claim rewards button not found!');
+    }
+
+    });
+
+
+
+    
+</script>
+
+</body>
+</html>
